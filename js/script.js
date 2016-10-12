@@ -18,9 +18,13 @@ $(document).ready(function() {
         reader.readAsDataURL(file);
     });
 
-    $('#pldc-button').on('click', function() {
-        if (!isLoaded) return;
-        $overlay.toggle();
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+        if (request.message === 'toggleOverlay') {
+            if (!isLoaded) return;
+            $overlay.toggle();
+        }
+
+        sendResponse();
     });
 
     function setupDOM () {
@@ -28,16 +32,15 @@ $(document).ready(function() {
                          "style=\"position: absolute; top: 0px; right: 0px; background-color: white; z-index: 9999;\">" +
                          "</form>";
         var inputText  = "<input id=\"pldc-input\" type=\"file\" name=\"userfile\" accept=\"image\/\*\">";
-        var buttonText = "<div id=\"pldc-button\" " +
-                         "style=\"position: absolute; top: 0px; left: 0px;" +
-                         "width: 64px; height: 16px; border: solid 1px black; z-index: 9999;\">show/hide</div>";
 
         var $form   = $(formText);
         var $input  = $(inputText);
-        var $button = $(buttonText);
 
         var contentHeight = Math.max.apply(null, [
-            document.body.clientHeight, document.body.scrollHeight, document.documentElement.scrollHeight, document.documentElement.clientHeight
+            document.body.clientHeight,
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.documentElement.clientHeight
         ]);
 
         var $overlay = $('<img id=\"pldc-overlay\">');
@@ -56,7 +59,6 @@ $(document).ready(function() {
 
         $form.append($input);
         $('body').append($form);
-        $('body').append($button);
         $('body').append($overlay);
     }
 });
